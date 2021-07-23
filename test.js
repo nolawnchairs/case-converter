@@ -71,8 +71,7 @@ test('Ensure title case works for multiple words', () => {
 
 
 test('Ensure functional API exports and runs correctly', () => {
-  const nameCased = toNameCase('frodo baggins d\'artagnan saint-claire')
-  const titleCased = toTitleCase('frodo')
-  expect(nameCased).toBe('Frodo Baggins d\'Artagnan Saint-Claire')
-  expect(titleCased).toBe('Frodo')
+  expect(toNameCase('frodo baggins d\'artagnan saint-claire')).toBe('Frodo Baggins d\'Artagnan Saint-Claire')
+  expect(toTitleCase('frodo')).toBe('Frodo')
+  expect(toTitleCase('the fellowship of the ring')).toBe('The Fellowship of the Ring')
 })
