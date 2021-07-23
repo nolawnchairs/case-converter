@@ -154,7 +154,7 @@ export class NameCaseConverter {
       return word.replace(/^(ma?c)([A-Za-z]+)$/i, '$1 $2').split(' ').map(p => NameCaseConverter.toTitleCase(p)).join('')
     }
 
-    // Test for L'Whatever or D'whatever
+    // Test for L'Whatever, O'Whatever or D'whatever
     if (/^[ldo]\'/i.test(word)) {
       const suffix = NameCaseConverter.toTitleCase(word.substring(2, word.length))
       return chunkIndex
