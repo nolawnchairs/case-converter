@@ -107,7 +107,7 @@ function toTitleCase(input: string): string
 
 console.log(
   toNameCase('frodo baggins'),
-  toTitleCase('samwise')) // "Frodo Baggins", "Samwise"
+  toTitleCase('the fellowship of the ring')) // "Frodo Baggins", "The Fellowship of the Ring"
 ```
 
 ## Notes
