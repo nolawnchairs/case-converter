@@ -75,15 +75,15 @@ export declare function toNameCase(input: string, options?: NameCaseConverterOpt
  */
 export declare function toTitleCase(input: string): string;
 /**
- * reates an instance of IgnoreRule.
+ * Creates an instance of IgnoreRule.
  */
 export declare function createIgnoreRule(matcher: string, caseInsensitive?: boolean): IgnoreRule;
 /**
- * reates an instance of IgnoreRule.
+ * Creates an instance of IgnoreRule.
  */
 export declare function createIgnoreRule(matcher: string[], caseInsensitive: boolean): IgnoreRule;
 /**
- * reates an instance of IgnoreRule.
+ * Creates an instance of IgnoreRule.
  */
 export declare function createIgnoreRule(matcher: RegExp): IgnoreRule;
 /**
