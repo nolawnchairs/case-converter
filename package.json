@@ -1,0 +1,24 @@
+{
+  "name": "@nolawnchairs/name-case",
+  "version": "1.0.0",
+  "description": "Parses proper names into title case",
+  "main": "index.js",
+  "author": "Michael Wieczorek <nolawnchairs@gmail.com>",
+  "keywords": [],
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nolawnchairs/proper-name-case"
+  },
+  "bugs": {
+    "url": "https://github.com/nolawnchairs/proper-name-case/issues"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.24",
+    "jest": "^27.0.6"
+  },
+  "scripts": {
+    "test": "jest",
+    "test:run": "nodemon -x 'jest'"
+  }
+}
