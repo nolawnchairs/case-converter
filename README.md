@@ -72,7 +72,7 @@ console.log(result) // "Dave DeSantos_1"
 
 ## Title Case
 
-The API also exposes a simple static title-case method, while used internally, and will properly title case a word or sentance. If the input is a single word it will be capitalized:
+The API also exposes a simple static title-case method, while used internally, and will properly title case a word or sentence. If the input is a single word it will be capitalized:
 
 ```typescript
 const titleCased = NameCaseConverter.toTitleCase('frodo')
@@ -99,14 +99,15 @@ import { toNameCase, toTitleCase } = from '@nolawnchairs/name-case/functional'
 // Alias for new NameCaseConverter().toString()
 function toNameCase(input: string, options?: NameCaseConverterOptions): string
 
+console.log(toNameCase('john mclane')) // "John McClane"
+
 // Converts a single word to Title Case
 // Alias to NameCaseConverter.toTitleCase()
 function toTitleCase(input: string): string
 
-const nameCased = toNameCase('frodo baggins')
-const titleCased = toTitleCase('samwise')
-
-console.log([nameCased, titleCased]) // ["Frodo Baggins", "Samwise"]
+console.log(
+  toNameCase('frodo baggins'),
+  toTitleCase('samwise')) // "Frodo Baggins", "Samwise"
 ```
 
 ## Notes
