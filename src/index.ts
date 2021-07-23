@@ -83,6 +83,9 @@ export interface NameCaseConverterOptions {
  * @class NameCaseConverter
  */
 export class NameCaseConverter {
+
+  private input: string = ''
+
   /**
    * Creates an instance of NameCaseConverter.
    * @param {string} input the input (unsanitized) value to convert
@@ -90,8 +93,10 @@ export class NameCaseConverter {
    * @memberof NameCaseConverter
    */
   constructor(
-    readonly input: string,
-    readonly options?: NameCaseConverterOptions) { }
+    input: string,
+    readonly options?: NameCaseConverterOptions) {
+    this.input = input.trim()
+  }
 
   /**
    * Processes each space-separated part of the input
@@ -115,16 +120,15 @@ export class NameCaseConverter {
   private parseWord(word: string, chunkIndex: number): string {
     // Match any ignore rules provided in the options
     if (this.options?.ignores?.length) {
-      const trimmed = word.trim()
       for (const rule of this.options.ignores) {
-        if (typeof rule.matcher == 'string' && this.matches(trimmed, rule.matcher, rule.caseInsensitive)) {
-          return trimmed
+        if (typeof rule.matcher == 'string' && this.matches(word, rule.matcher, rule.caseInsensitive)) {
+          return word
         } else if (rule.matcher instanceof RegExp) {
           if (rule.matcher.test(word))
-            return trimmed
+            return word
         } else if (Array.isArray(rule.matcher)) {
-          if (rule.matcher.find(s => this.matches(trimmed, s, rule.caseInsensitive)))
-            return trimmed
+          if (rule.matcher.find(s => this.matches(word, s, rule.caseInsensitive)))
+            return word
         }
       }
     }
@@ -141,21 +145,21 @@ export class NameCaseConverter {
     // Test for hyphenated names, but run each part through
     // another conversion layer
     if (word.includes('-')) {
-      const parts = word.split('-').map(p => p.trim())
-      return parts.map(part => new NameCaseConverter(part, this.options).toString()).join('-')
+      return word.split('-').map(p => p.trim())
+        .map(part => new NameCaseConverter(part, this.options).toString()).join('-')
     }
 
     // Test for MacWhatever or McWhatever
     if (/^ma?c[A-Za-z]+$/i.test(word)) {
-      return word.trim().replace(/^(ma?c)([A-Za-z]+)$/i, '$1 $2').split(' ').map(p => NameCaseConverter.toTitleCase(p)).join('')
+      return word.replace(/^(ma?c)([A-Za-z]+)$/i, '$1 $2').split(' ').map(p => NameCaseConverter.toTitleCase(p)).join('')
     }
 
     // Test for L'Whatever or D'whatever
     if (/^[ldo]\'/i.test(word)) {
       const suffix = NameCaseConverter.toTitleCase(word.substring(2, word.length))
       return chunkIndex
-        ? word.trim().charAt(0) + '\'' + suffix
-        : word.trim().charAt(0).toUpperCase() + '\'' + suffix
+        ? word.charAt(0) + '\'' + suffix
+        : word.charAt(0).toUpperCase() + '\'' + suffix
     }
 
     // Simply return a title cased string in any other case
