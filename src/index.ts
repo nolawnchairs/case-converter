@@ -20,7 +20,7 @@ export class IgnoreRule {
    * Creates an instance of IgnoreRule. Not exposed to the public API,
    * instead use static factory methods
    *
-   * @param {(string | RegExp)} matcher string or regex matcher
+   * @param {(string | string[] | RegExp)} matcher string, string array or regex matcher
    * @param {boolean} [caseInsensitive=false] whether a string matcher is case-insensitive
    * @memberof IgnoreRule
    */
@@ -203,4 +203,52 @@ export class NameCaseConverter {
       ? v1.toLowerCase() == v2.toLowerCase()
       : v1 == v2
   }
+}
+
+/**
+ * Converts an input string to the proper name-cased value
+ *
+ * @export
+ * @param {string} input the input (unsanitized) value to convert
+ * @param {NameCaseConverterOptions} [options] an optional object of options to apply
+ * @return {*}  {string}
+ */
+export function toNameCase(input: string, options?: NameCaseConverterOptions): string {
+  const converter = new NameCaseConverter(input, options)
+  return converter.toString()
+}
+
+/**
+ * Converts a string to Title Case
+ *
+ * @export
+ * @param {string} input the input string
+ * @return {*}  {string}
+ */
+export function toTitleCase(input: string): string {
+  return NameCaseConverter.toTitleCase(input)
+}
+
+/**
+ * reates an instance of IgnoreRule.
+ *
+ * @export
+ * @param {(string | string[] | RegExp)} matcher string, string array or regex matcher
+ * @param {boolean} [caseInsensitive=false] hether a string matcher is case-insensitive
+ * @return {*}  {IgnoreRule}
+ */
+export function createIgnoreRule(matcher: string | string[] | RegExp, caseInsensitive = false): IgnoreRule {
+  return new IgnoreRule(matcher, caseInsensitive)
+}
+
+/**
+ * Creates an instance of CustomConverter.
+ *
+ * @export
+ * @param {RegExp} regex the regex that will be matched against input strings
+ * @param {(value: string, chunkIndex: number) => string} callback a function that returns the desired output
+ * @return {*}  {CustomConverter}
+ */
+export function createConverter(regex: RegExp, callback: (value: string, chunkIndex: number) => string): CustomConverter {
+  return new CustomConverter(regex, callback)
 }

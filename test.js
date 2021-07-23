@@ -1,5 +1,4 @@
-const { NameCaseConverter, CustomConverter, IgnoreRule } = require('.')
-const { toNameCase, toTitleCase } = require('./lib/functional')
+const { NameCaseConverter, CustomConverter, IgnoreRule, toNameCase, toTitleCase } = require('.')
 
 test('Ensure standard names come back as title cased', () => {
   const converter = new NameCaseConverter('robbins')

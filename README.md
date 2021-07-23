@@ -88,11 +88,8 @@ console.log(titleCased) // "Lord of the Rings"
 
 ## Functional API
 
-For those who prefer a functional approach, you can import the functional library like so:
+For those who prefer a functional approach, the following functions are available:
 
-```typescript
-import { toNameCase, toTitleCase } = from '@nolawnchairs/name-case/functional'
-```
 
 ```typescript
 // Converts a string and (all words) to a proper name-cased string
