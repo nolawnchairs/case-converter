@@ -179,7 +179,7 @@ export class NameCaseConverter {
     if (/\s+/.test(input)) {
       return new NameCaseConverter(input, {
         converters: [
-          new CustomConverter(/^(a|an|the|to|in|on|of|from|and|with|if)$/i, (word, chunk) => {
+          new CustomConverter(/^(a|an|the|to|in|on|of|from|and|with)$/i, (word, chunk) => {
             return chunk ? word.toLowerCase() : NameCaseConverter.toTitleCase(word)
           })
         ]
@@ -199,8 +199,8 @@ export class NameCaseConverter {
    * @memberof NameCaseConverter
    */
   private matches(v1: string, v2: string, ci: boolean): boolean {
-    if (ci)
-      return v1.toLowerCase() == v2.toLowerCase()
-    return v1 == v2
+    return ci
+      ? v1.toLowerCase() == v2.toLowerCase()
+      : v1 == v2
   }
 }
