@@ -6,12 +6,12 @@ export class CustomConverter {
    * and returns the final value to apply to the output
    *
    * @param {RegExp} regex the regex that will be matched against input strings
-   * @param {(value: string, chunkIndex: number, options: NameCaseConverterOptions) => string} operator a function that returns the desired output
+   * @param {(chunk: string, index: number, options: NameCaseConverterOptions) => string} operator a function that returns the desired output
    * @memberof CustomConverter
    */
   constructor(
     readonly regex: RegExp,
-    readonly operator: (value: string, chunkIndex: number, options: NameCaseConverterOptions) => string) { }
+    readonly operator: (chunk: string, index: number, options: NameCaseConverterOptions) => string) { }
 }
 
 export class IgnoreRule {
@@ -81,17 +81,17 @@ export interface NameCaseConverterOptions {
  */
 const defaultConverters = [
   // Hyphenated words
-  new CustomConverter(/-/, (word, _, options) => word.split('-').map(p => p.trim())
+  new CustomConverter(/-/, (chunk, _, options) => chunk.split('-').map(p => p.trim())
     .map(part => new NameCaseConverter(part, options).toString()).join('-')),
   // Words starting with Mc or Mac
-  new CustomConverter(/^ma?c[A-Za-z]+$/i, word =>
-    word.replace(/^(ma?c)([A-Za-z]+)$/i, '$1 $2').split(' ').map(p => NameCaseConverter.toTitleCase(p)).join('')),
+  new CustomConverter(/^ma?c[A-Za-z]+$/i, chunk =>
+    chunk.replace(/^(ma?c)([A-Za-z]+)$/i, '$1 $2').split(' ').map(p => NameCaseConverter.toTitleCase(p)).join('')),
   // Words starting with L, O or D plus apostrophe
-  new CustomConverter(/^[ldo]\'/i, (word, chunk) => {
-    const suffix = NameCaseConverter.toTitleCase(word.substring(2, word.length))
-    return chunk
-      ? word.charAt(0) + '\'' + suffix
-      : word.charAt(0).toUpperCase() + '\'' + suffix
+  new CustomConverter(/^[ldo]\'/i, (chunk, index) => {
+    const suffix = NameCaseConverter.toTitleCase(chunk.substring(2, chunk.length))
+    return index
+      ? chunk.charAt(0) + '\'' + suffix
+      : chunk.charAt(0).toUpperCase() + '\'' + suffix
   })
 ]
 
@@ -179,8 +179,8 @@ export class NameCaseConverter {
     if (/\s+/.test(input)) {
       return new NameCaseConverter(input, {
         converters: [
-          new CustomConverter(/^(a|an|the|to|in|on|of|from|and|with)$/i, (word, chunk) => {
-            return chunk ? word.toLowerCase() : NameCaseConverter.toTitleCase(word)
+          new CustomConverter(/^(a|an|the|to|in|on|of|from|and|with)$/i, (chunk, index) => {
+            return index ? chunk.toLowerCase() : NameCaseConverter.toTitleCase(chunk)
           })
         ]
       }).toString()
@@ -209,7 +209,7 @@ export class NameCaseConverter {
  * Converts an input string to the proper name-cased value
  *
  * @export
- * @param {string} input the input (unsanitized) value to convert
+ * @param {string} input the input value to convert
  * @param {NameCaseConverterOptions} [options] an optional object of options to apply
  * @return {*}  {string}
  */
@@ -230,11 +230,11 @@ export function toTitleCase(input: string): string {
 }
 
 /**
- * reates an instance of IgnoreRule.
+ * Creates an instance of IgnoreRule.
  *
  * @export
  * @param {(string | string[] | RegExp)} matcher string, string array or regex matcher
- * @param {boolean} [caseInsensitive=false] hether a string matcher is case-insensitive
+ * @param {boolean} [caseInsensitive=false] whether a string matcher is case-insensitive
  * @return {*}  {IgnoreRule}
  */
 export function createIgnoreRule(matcher: string | string[] | RegExp, caseInsensitive = false): IgnoreRule {

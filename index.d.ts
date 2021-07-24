@@ -5,7 +5,7 @@ export declare class CustomConverter {
    * an operator function. The operator function supplies a string that was matched to the provided regex
    * and returns the final value to apply to the output
    */
-  constructor(regex: RegExp, operator: (value: string, chunkIndex: number) => string);
+  constructor(regex: RegExp, operator: (chunk: string, index: number, options: NameCaseConverterOptions) => string);
 }
 
 export declare class IgnoreRule {
