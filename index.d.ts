@@ -1,11 +1,14 @@
 
+
+export declare type ConverterOperator = (chunk: string, index: number, accumulated: string[], options: NameCaseConverterOptions) => string
+
 export declare class CustomConverter {
   /**
    * Creates an instance of CustomConverter. Provide a regex matcher and
    * an operator function. The operator function supplies a string that was matched to the provided regex
    * and returns the final value to apply to the output
    */
-  constructor(regex: RegExp, operator: (chunk: string, index: number, options: NameCaseConverterOptions) => string);
+  constructor(regex: RegExp, operator: ConverterOperator);
 }
 
 export declare class IgnoreRule {

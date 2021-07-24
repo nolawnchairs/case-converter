@@ -1,4 +1,6 @@
 
+export type ConverterOperator = (chunk: string, index: number, accumulated: string[], options: NameCaseConverterOptions) => string
+
 export class CustomConverter {
   /**
    * Creates an instance of CustomConverter. Provide a regex matcher and
@@ -6,12 +8,12 @@ export class CustomConverter {
    * and returns the final value to apply to the output
    *
    * @param {RegExp} regex the regex that will be matched against input strings
-   * @param {(chunk: string, index: number, options: NameCaseConverterOptions) => string} operator a function that returns the desired output
+   * @param {ConverterOperator} operator a function that returns the desired output
    * @memberof CustomConverter
    */
   constructor(
     readonly regex: RegExp,
-    readonly operator: (chunk: string, index: number, options: NameCaseConverterOptions) => string) { }
+    readonly operator: ConverterOperator) { }
 }
 
 export class IgnoreRule {
@@ -81,7 +83,7 @@ export interface NameCaseConverterOptions {
  */
 const defaultConverters = [
   // Hyphenated words
-  new CustomConverter(/-/, (chunk, _, options) => chunk.split('-').map(p => p.trim())
+  new CustomConverter(/-/, (chunk, _, __, options) => chunk.split('-').map(p => p.trim())
     .map(part => new NameCaseConverter(part, options).toString()).join('-')),
   // Words starting with Mc or Mac
   new CustomConverter(/^ma?c[A-Za-z]+$/i, chunk =>
@@ -125,7 +127,13 @@ export class NameCaseConverter {
    * @memberof NameCaseConverter
    */
   toString(): string {
-    return this.input.split(/\s+/).map((word, i) => this.parseWord(word.trim(), i)).join(' ')
+    const words = this.input.split(/\s+/)
+    const accumulated: string[] = []
+    for (const word of words) {
+      const current = this.parseWord(word, accumulated)
+      accumulated.push(current)
+    }
+    return accumulated.join(' ')
   }
   /**
    * Converts a string to Title Case
@@ -136,7 +144,7 @@ export class NameCaseConverter {
    * @return {*}  {string}
    * @memberof NameCaseConverter
    */
-  private parseWord(word: string, chunkIndex: number): string {
+  private parseWord(word: string, accumulated: string[]): string {
     // Match any ignore rules provided in the options
     if (this.options?.ignores?.length) {
       for (const rule of this.options.ignores) {
@@ -158,7 +166,7 @@ export class NameCaseConverter {
     // Run through converters
     for (const converter of converters) {
       if (converter.regex.test(word)) {
-        return converter.operator(word, chunkIndex, this.options)
+        return converter.operator(word, accumulated.length, accumulated, this.options)
       }
     }
 

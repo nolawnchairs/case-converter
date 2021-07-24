@@ -61,12 +61,14 @@ IgnoreRule.exact(['Frodo', 'Sam', 'Merry'])
 The operator callback function provides the following arguments:
 
 ```typescript
-function (chunk: string, index: number, options: NameCaseConverterOptions) => string
+function (chunk: string, index: number, accumulated: string[], options: NameCaseConverterOptions) => string
 ```
 
 `chunk` - The unaltered string chunk that was matched via regex
 
-`index` - The index of the string chunk. This can be useful for determining if the chunk is the first word of multiple
+`index` - The index of the string chunk. This can be useful for determining if the chunk is the first word of multiple words
+
+`accumulated` - A string array of the chunks already converted. Useful if the action to take on the current chunk depends on previous results of the iteration.
 
 `options` - The `NameCaseConverterOptions` object provided. This can be useful if you need to pass options down to another conversion layer using the same configuration to any recursive implementations of `NameCaseConverter` within your custom converter
 
