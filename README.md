@@ -73,7 +73,7 @@ console.log(result) // "Dave DeSantos_1"
 
 ## Title Case
 
-The API also exposes a simple static title-case method, while used internally, and will properly title case a word or sentence. If the input is a single word it will be capitalized indiscriminantly:
+The API also exposes a simple static title-case method. It will properly title case a word or all words in a sentence. If the input is a single word it will be capitalized indiscriminantly:
 
 ```typescript
 const titleCased = NameCaseConverter.toTitleCase('frodo')
