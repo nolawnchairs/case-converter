@@ -6,12 +6,12 @@ export class CustomConverter {
    * and returns the final value to apply to the output
    *
    * @param {RegExp} regex the regex that will be matched against input strings
-   * @param {(value: string, chunkIndex: number) => string} operator a function that returns the desired output
+   * @param {(value: string, chunkIndex: number, options: NameCaseConverterOptions) => string} operator a function that returns the desired output
    * @memberof CustomConverter
    */
   constructor(
     readonly regex: RegExp,
-    readonly operator: (value: string, chunkIndex: number) => string) { }
+    readonly operator: (value: string, chunkIndex: number, options: NameCaseConverterOptions) => string) { }
 }
 
 export class IgnoreRule {
@@ -77,6 +77,25 @@ export interface NameCaseConverterOptions {
 }
 
 /**
+ * Built-in converters
+ */
+const defaultConverters = [
+  // Hyphenated words
+  new CustomConverter(/-/, (word, _, options) => word.split('-').map(p => p.trim())
+    .map(part => new NameCaseConverter(part, options).toString()).join('-')),
+  // Words starting with Mc or Mac
+  new CustomConverter(/^ma?c[A-Za-z]+$/i, word =>
+    word.replace(/^(ma?c)([A-Za-z]+)$/i, '$1 $2').split(' ').map(p => NameCaseConverter.toTitleCase(p)).join('')),
+  // Words starting with L, O or D plus apostrophe
+  new CustomConverter(/^[ldo]\'/i, (word, chunk) => {
+    const suffix = NameCaseConverter.toTitleCase(word.substring(2, word.length))
+    return chunk
+      ? word.charAt(0) + '\'' + suffix
+      : word.charAt(0).toUpperCase() + '\'' + suffix
+  })
+]
+
+/**
  * The base NameCaseConverter class
  *
  * @export
@@ -88,7 +107,7 @@ export class NameCaseConverter {
 
   /**
    * Creates an instance of NameCaseConverter.
-   * @param {string} input the input (unsanitized) value to convert
+   * @param {string} input the input value to convert
    * @param {NameCaseConverterOptions} [options] an optional object of options to apply
    * @memberof NameCaseConverter
    */
@@ -133,33 +152,14 @@ export class NameCaseConverter {
       }
     }
 
-    // Match any custom converters provided in the options
-    if (this.options?.converters?.length) {
-      for (const converter of this.options.converters) {
-        if (converter.regex.test(word)) {
-          return converter.operator(word, chunkIndex)
-        }
+    // Merge provided custom converters with default converters
+    const converters = [...(this.options?.converters ?? []), ...defaultConverters]
+
+    // Run through converters
+    for (const converter of converters) {
+      if (converter.regex.test(word)) {
+        return converter.operator(word, chunkIndex, this.options)
       }
-    }
-
-    // Test for hyphenated names, but run each part through
-    // another conversion layer
-    if (word.includes('-')) {
-      return word.split('-').map(p => p.trim())
-        .map(part => new NameCaseConverter(part, this.options).toString()).join('-')
-    }
-
-    // Test for MacWhatever or McWhatever
-    if (/^ma?c[A-Za-z]+$/i.test(word)) {
-      return word.replace(/^(ma?c)([A-Za-z]+)$/i, '$1 $2').split(' ').map(p => NameCaseConverter.toTitleCase(p)).join('')
-    }
-
-    // Test for L'Whatever, O'Whatever or D'whatever
-    if (/^[ldo]\'/i.test(word)) {
-      const suffix = NameCaseConverter.toTitleCase(word.substring(2, word.length))
-      return chunkIndex
-        ? word.charAt(0) + '\'' + suffix
-        : word.charAt(0).toUpperCase() + '\'' + suffix
     }
 
     // Simply return a title cased string in any other case
