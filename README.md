@@ -24,8 +24,12 @@ Provide a string of single or multiple words to the constructor
 const input = 'fordo baggins'
 const cased = new NameCaseConverter(input).toString()
 console.log(cased) // "Frodo Baggins"
-
 ```
+
+The built-in converters are called in the following order:
+  * Hyphenated words
+  * Words starting with Mc or Mac
+  * Words starting with L', O' or D'
 
 ## Options
 
@@ -52,7 +56,19 @@ IgnoreRule.insensitive(['frodo', 'sam', 'merry'])
 IgnoreRule.exact('Frodo')
 IgnoreRule.exact(['Frodo', 'Sam', 'Merry'])
 ```
-`converters` - an array of `CustomConverter` instances that will provide a user-defined conversion matched by the regex provided in the constructor. The callback function will pass the `value`, the unaltered (but trimmed) value being operated on, as well as the `index`, which is the chunk index of the value. The callback function will be called for each "chunk" making up the word (each separate word in a space-separated input):
+`converters` - an array of `CustomConverter` instances that will provide a user-defined conversion matched by the regex provided in the constructor, and operated on by the callback operator function provided. These converters will be called *before* any of the default converters used internally.
+
+The operator callback function provides the following arguments:
+
+```typescript
+(chunk: string, index: number, options: NameCaseConverterOptions) => string
+```
+
+`chunk` - The unaltered string chunk that was matched via regex
+
+`index` - The index of the string chunk. This can be useful for determining if the chunk is the first word of multiple
+
+`options` - The `NameCaseConverterOptions` object provided. This can be useful if you need to pass options down to another conversion layer using the same configuration to any recursive implementations of `NameCaseConverter` within your custom converter
 
 ```typescript
 new CustomConverter(/^Mac[^aeiou]/, (value, index) => {
@@ -62,14 +78,14 @@ new CustomConverter(/^Mac[^aeiou]/, (value, index) => {
 // An example leveraging chunk index
 const converter = new NameCaseConverter('Dave DeSantos', {
   converters: [
-    new CustomConverter(/^De[A-Z][a-z]+$/, (w, i) => `${w}_${i}`)
+    new CustomConverter(/^De[A-Z][a-z]+$/, (chunk, i) => `${chunk}_${i}`)
   ]
 })
 const result = converter.toString()
 console.log(result) // "Dave DeSantos_1"
 ```
 
-> This is obviously a contrived example, but shows how a custom converter works
+> This is obviously a contrived example, but shows how a custom converter works.
 
 ## Title Case
 
@@ -95,9 +111,9 @@ If you wish to add your own rules as to which words will be forced to lowercase,
 ```typescript
 new NameCaseConverter(input, {
   converters: [
-    new CustomConverter(/^(whichever|words|you|want|to|be|forced|to|lowercase)$/i, (word, chunk) => {
+    new CustomConverter(/^(whichever|words|you|want|to|be|forced|to|lowercase)$/i, (chunk, index) => {
       // The first chunk (word) passed will be title-cased, all others will be converted to lowercase
-      return chunk ? word.toLowerCase() : NameCaseConverter.toTitleCase(word)
+      return index ? chunk.toLowerCase() : NameCaseConverter.toTitleCase(chunk)
     })
   ]
 })
@@ -145,7 +161,7 @@ function createConverter(regex: RegExp, callback: (value: string, chunkIndex: nu
 
 const result = toNameCase('Dave DeSantos', {
   converters: [
-    createConverter(/^DeS[aeiou]+$/, w => toTitleCase(w))
+    createConverter(/^DeS[aeiou]+$/, chunk => toTitleCase(chunk))
   ]
 })
 console.log(result) // "Dave Desantos"
