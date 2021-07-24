@@ -106,7 +106,7 @@ export class NameCaseConverter {
    * @memberof NameCaseConverter
    */
   toString(): string {
-    return this.input.split(/\s+/).map((word, i) => this.parseWord(word, i)).join(' ')
+    return this.input.split(/\s+/).map((word, i) => this.parseWord(word.trim(), i)).join(' ')
   }
   /**
    * Converts a string to Title Case
