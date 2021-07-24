@@ -29,7 +29,7 @@ console.log(cased) // "Frodo Baggins"
 
 ## Options
 
-The `NameCaseConverter` constructor takes an optional object second parameter.
+The `NameCaseConverter` constructor takes an optional object as the second parameter.
 
 ```typescript
 interface NameCaseConverterOptions {
