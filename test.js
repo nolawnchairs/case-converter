@@ -101,3 +101,10 @@ test('Ensure global options are set', () => {
   expect(toNameCase('GGG')).toBe('GGG')
   expect(toNameCase('GG')).toBe('Gg')
 })
+
+
+test('Ensure global ignore is overridden', () => {
+  expect(toNameCase('GG', { ignores: [IgnoreRule.exact('GG')] })).toBe('GG')
+  expect(toNameCase('gg', { ignores: [IgnoreRule.insensitive('GG')] })).toBe('gg')
+  expect(toNameCase('gg', { ignores: [IgnoreRule.regex(/^GG/i)] })).toBe('gg')
+})
