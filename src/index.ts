@@ -134,7 +134,7 @@ export class NameCaseConverter {
         if (options?.disableDefault) {
           if (typeof options.disableDefault === 'boolean')
             return false
-          return options.disableDefault.findIndex(i => i == Number(id)) >= 0
+          return options.disableDefault.findIndex(i => i == Number(id)) < 0
         }
         return true
       })
