@@ -111,7 +111,7 @@ While these two methods ostensibly do the same thing, name case is designed for 
 For those who prefer a functional approach, the following functions are available:
 
 ### `toNameCase`
-Converts a string and (all words) to a proper name-cased string. Alias for new NameCaseConverter().toString()
+Converts a string and (all words) to a proper name-cased string. Alias for `new NameCaseConverter(word).toString()`
 
 ```typescript
 function toNameCase(input: string): string
@@ -121,7 +121,7 @@ console.log(toNameCase('john mclane')) // "John McClane"
 ```
 
 ### `toTitleCase`
-Converts a single word to Title Case. Alias for NameCaseConverter.toTitleCase()
+Converts a single word to Title Case. Alias for `NameCaseConverter.toTitleCase(word)`
 
 ```typescript
 function toTitleCase(input: string): string
