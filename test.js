@@ -63,7 +63,7 @@ test('Ensure default converter omission works', () => {
   expect(make(`Paddy o'brien`).toString()).toBe('Paddy O\'brien')
   expect(make('henry viii', false).toString()).toBe('Henry VIII')
 
-  expect(make('john mcclane', [ConverterId.MC_MAC]).toString()).toBe('John Mcclane')
+  expect(make('john mcclane', [ConverterId.MC]).toString()).toBe('John Mcclane')
   expect(make('saint-claire', [ConverterId.HYPENATED]).toString()).toBe('Saint-claire')
   expect(make(`l'amour o'brien`, [ConverterId.DLO_APOSTRAPHE]).toString()).toBe(`L'amour O'brien`)
   expect(make('Henry VIII', [ConverterId.ROMAN_NUMERALS]).toString()).toBe('Henry Viii')

@@ -86,7 +86,8 @@ export interface NameCaseConverterOptions {
  */
 export enum ConverterId {
   HYPENATED,
-  MC_MAC,
+  MC,
+  MAC,
   DLO_APOSTRAPHE,
   ROMAN_NUMERALS,
 }
@@ -97,10 +98,12 @@ export enum ConverterId {
 const defaultConverters: Record<ConverterId, Converter> = {
   [ConverterId.HYPENATED]: new Converter(/-/, (chunk, _, __, options) => chunk.split('-').map(p => p.trim())
     .map(part => new NameCaseConverter(part, options).toString()).join('-')),
-  [ConverterId.MC_MAC]: new Converter(/^ma?c[A-Za-z]+$/i, chunk =>
-    chunk.replace(/^(ma?c)([A-Za-z]+)$/i, '$1 $2').split(' ').map(p => NameCaseConverter.toTitleCase(p)).join('')),
+  [ConverterId.MC]: new Converter(/^mc[A-Za-z]+$/i, chunk =>
+    chunk.replace(/^(mc)([A-Za-z]+)$/i, '$1 $2').split(' ').map(p => toTitleCase(p)).join('')),
+  [ConverterId.MAC]: new Converter(/^mac[A-Za-z]+$/i, chunk =>
+    chunk.replace(/^(mac)([A-Za-z]+)$/i, '$1 $2').split(' ').map(p => toTitleCase(p)).join('')),
   [ConverterId.DLO_APOSTRAPHE]: new Converter(/^[ldo]\'/i, (chunk, index) => {
-    const suffix = NameCaseConverter.toTitleCase(chunk.substring(2, chunk.length))
+    const suffix = toTitleCase(chunk.substring(2, chunk.length))
     return index
       ? chunk.charAt(0) + '\'' + suffix
       : chunk.charAt(0).toUpperCase() + '\'' + suffix

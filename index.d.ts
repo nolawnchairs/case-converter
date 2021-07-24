@@ -60,7 +60,8 @@ export declare interface NameCaseConverterOptions {
  */
 export enum ConverterId {
   HYPENATED,
-  MC_MAC,
+  MC,
+  MAC,
   DLO_APOSTRAPHE,
   ROMAN_NUMERALS,
 }

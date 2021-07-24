@@ -95,8 +95,16 @@ console.log(result) // "Dave DeSantos"
 `disableDefault` - Provide an array of `ConverterId` enum values to selectively disable built-in converters, or supply `true` to disable all built-in converters. Supplying false will therefore have no effect.
 
 ```typescript
+export enum ConverterId {
+  HYPENATED,
+  MC,
+  MAC,
+  DLO_APOSTRAPHE,
+  ROMAN_NUMERALS,
+}
+
 const converter = NameCaseConverter.toTitleCase('mcclane', {
-  disableDefault: [ConverterId.MC_MAC]
+  disableDefault: [ConverterId.MC]
 })
 console.log(converter.toString()) // "Mcclane"
 ```
