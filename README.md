@@ -80,14 +80,17 @@ new CustomConverter(/^Mac[^aeiou]/, (value, index) => {
 // An example leveraging chunk index
 const converter = new NameCaseConverter('Dave DeSantos', {
   converters: [
-    new CustomConverter(/^De[A-Z][a-z]+$/, (chunk, i) => `${chunk}_${i}`)
+    new CustomConverter(/^De[A-Za-z]+$/, (chunk, index, accumulated) => {
+      console.log(chunk, index, accumulated) // "DeSantos", 1, ["Dave"]
+      return chunk
+    })
   ]
 })
 const result = converter.toString()
-console.log(result) // "Dave DeSantos_1"
+console.log(result) // "Dave DeSantos"
 ```
 
-> This is obviously a contrived example, but shows how a custom converter works.
+> This is obviously a contrived example since it doesn't do anythig, but shows how a custom converter works.
 
 ## Title Case
 
