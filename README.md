@@ -38,7 +38,7 @@ The `NameCaseConverter` constructor takes an optional object as the second param
 ```typescript
 interface NameCaseConverterOptions {
   ignores?: IgnoreRule[]
-  converters?: CustomConverter[]
+  converters?: Converter[]
 }
 ```
 
@@ -56,7 +56,7 @@ IgnoreRule.insensitive(['frodo', 'sam', 'merry'])
 IgnoreRule.exact('Frodo')
 IgnoreRule.exact(['Frodo', 'Sam', 'Merry'])
 ```
-`converters` - an array of `CustomConverter` instances that will provide a user-defined conversion matched by the regex provided in the constructor, and operated on by the callback operator function provided. These converters will be called *before* any of the default converters used internally.
+`converters` - an array of `Converter` instances that will provide a user-defined conversion matched by the regex provided in the constructor, and operated on by the callback operator function provided. These converters will be called *before* any of the default converters used internally.
 
 The operator callback function provides the following arguments:
 
@@ -73,14 +73,14 @@ function (chunk: string, index: number, accumulated: string[], options: NameCase
 `options` - The `NameCaseConverterOptions` object provided. This can be useful if you need to pass options down to another conversion layer using the same configuration to any recursive implementations of `NameCaseConverter` within your custom converter
 
 ```typescript
-new CustomConverter(/^Mac[^aeiou]/, (value, index) => {
+new Converter(/^Mac[^aeiou]/, (value, index) => {
   return 'A custom string'
 })
 
 // An example leveraging chunk index
 const converter = new NameCaseConverter('Dave DeSantos', {
   converters: [
-    new CustomConverter(/^De[A-Za-z]+$/, (chunk, index, accumulated) => {
+    new Converter(/^De[A-Za-z]+$/, (chunk, index, accumulated) => {
       console.log(chunk, index, accumulated) // "DeSantos", 1, ["Dave"]
       return chunk
     })
@@ -113,14 +113,14 @@ console.log(titleCased) // "Lord of the Rings"
 
 ### Title Case vs Name Case
 
-While these two methods ostensibly do the same thing, name case is designed for converting people's names and allows granular control over string conversion via `IgnoreRule` and `CustomConverter` implementations provided to it. Title case, on the other hand is not configurable, and is designed for converting sentences such as movie and book titles.
+While these two methods ostensibly do the same thing, name case is designed for converting people's names and allows granular control over string conversion via `IgnoreRule` and `Converter` implementations provided to it. Title case, on the other hand is not configurable, and is designed for converting sentences such as movie and book titles.
 
 If you wish to add your own rules as to which words will be forced to lowercase, you can create a new instance of `NameCaseConverter` with your regular expression defined as a custom converter (which is what this method actually does internally):
 
 ```typescript
 new NameCaseConverter(input, {
   converters: [
-    new CustomConverter(/^(whichever|words|you|want|to|be|forced|to|lowercase)$/i, (chunk, index) => {
+    new Converter(/^(whichever|words|you|want|to|be|forced|to|lowercase)$/i, (chunk, index) => {
       // The first chunk (word) passed will be title-cased, all others will be converted to lowercase
       return index ? chunk.toLowerCase() : NameCaseConverter.toTitleCase(chunk)
     })
@@ -160,10 +160,10 @@ function createIgnoreRule(matcher: string[], caseInsensitive?: boolean): IgnoreR
 function createIgnoreRule(matcher: RegExp): IgnoreRule;
 ```
 
-### `createCustomConverter`
-Creates an instance of `CustomConverter`
+### `createConverter`
+Creates an instance of `Converter`
 ```typescript
-function createConverter(regex: RegExp, callback: (value: string, chunkIndex: number) => string): CustomConverter;
+function createConverter(regex: RegExp, callback: (value: string, chunkIndex: number) => string): Converter;
 
 const result = toNameCase('Dave DeSantos', {
   converters: [
