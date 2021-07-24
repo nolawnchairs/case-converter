@@ -53,7 +53,8 @@ export declare class NameCaseConverter {
   /**
    * Creates an instance of NameCaseConverter.
    */
-  constructor(input: string, options?: NameCaseConverterOptions);
+  constructor(input: string);
+  constructor(input: string, options: NameCaseConverterOptions);
   /**
    * Processes each space-separated part of the input
    * into proper name-case
@@ -69,7 +70,11 @@ export declare class NameCaseConverter {
 /**
  * Converts an input string to the proper name-cased value
  */
-export declare function toNameCase(input: string, options?: NameCaseConverterOptions): string;
+export declare function toNameCase(input: string): string;
+/**
+ * Converts an input string to the proper name-cased value
+ */
+export declare function toNameCase(input: string, options: NameCaseConverterOptions): string;
 /**
  * Converts a string to Title Case
  */
@@ -81,7 +86,7 @@ export declare function createIgnoreRule(matcher: string, caseInsensitive?: bool
 /**
  * Creates an instance of IgnoreRule.
  */
-export declare function createIgnoreRule(matcher: string[], caseInsensitive: boolean): IgnoreRule;
+export declare function createIgnoreRule(matcher: string[], caseInsensitive?: boolean): IgnoreRule;
 /**
  * Creates an instance of IgnoreRule.
  */
