@@ -83,11 +83,24 @@ const titleCased2 = NameCaseConverter.toTitleCase('McClane')
 console.log(titleCased2) // "Mcclane"
 ```
 
-If the input contains one or more spaces, each word is capitalized except for common articles, conjunctions and prepositions:
+If the input contains one or more spaces, each word passed through the default name case conversion layer, applying the  built-in rule sets without additional configuration. Common articles, conjunctions and prepositions are converted to lowercase:
 
 ```typescript
 const titleCased = NameCaseConverter.toTitleCase('lord of the rings')
 console.log(titleCased) // "Lord of the Rings"
+```
+
+If you wish to add your own rules as to which words will be forced to lowercase, you can create a new instance of `NameCaseConverter` with your regular expression defined as a custom converter (which is what this method actually does internally):
+
+```typescript
+new NameCaseConverter(input, {
+  converters: [
+    new CustomConverter(/^(whichever|words|you|want|to|be|forced|to|lowercase)$/i, (word, chunk) => {
+      // The first chunk (word) passed will be title-cased, all others will be converted to lowercase
+      return chunk ? word.toLowerCase() : NameCaseConverter.toTitleCase(word)
+    })
+  ]
+})
 ```
 
 ### Title Case vs Name Case
