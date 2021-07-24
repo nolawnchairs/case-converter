@@ -106,6 +106,10 @@ const titleCased = NameCaseConverter.toTitleCase('lord of the rings')
 console.log(titleCased) // "Lord of the Rings"
 ```
 
+### Title Case vs Name Case
+
+While these two methods ostensibly do the same thing, name case is designed for converting people's names and allows granular control over string conversion via `IgnoreRule` and `CustomConverter` implementations provided to it. Title case, on the other hand is not configurable, and is designed for converting sentences such as movie and book titles.
+
 If you wish to add your own rules as to which words will be forced to lowercase, you can create a new instance of `NameCaseConverter` with your regular expression defined as a custom converter (which is what this method actually does internally):
 
 ```typescript
@@ -119,9 +123,6 @@ new NameCaseConverter(input, {
 })
 ```
 
-### Title Case vs Name Case
-
-While these two methods ostensibly do the same thing, name case is designed for converting people's names and allows granular control over string conversion via `IgnoreRule` and `CustomConverter` implementations provided to it. Title case, on the other hand is not configurable, and is designed for converting sentences such as movie and book titles.
 ## Functional API
 
 For those who prefer a functional approach, the following functions are available:
