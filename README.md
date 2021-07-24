@@ -11,6 +11,7 @@ O'Brien
 L'Agnes
 D'Artagnan
 Saint-Claire
+Rama IX
 ```
 
 The functionality is biased towards proper English-language conventions.
