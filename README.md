@@ -109,6 +109,24 @@ const converter = NameCaseConverter.toTitleCase('mcclane', {
 console.log(converter.toString()) // "Mcclane"
 ```
 
+## Global Options
+
+Options can be applied globally. Any options passed to converters will be merged with global options, with user-defined options taking precedence. Any Converters or IgnoreRules passed to converters will be added to those set globally and will also take precedence.
+
+```typescript
+NameCaseConverter.setGlobalOptions({
+  converters: [
+    new Converter(/^De[A-Za-z]+$/, (chunk, index, accumulated) => {
+      console.log(chunk, index, accumulated) // "DeSantos", 1, ["Dave"]
+      return chunk
+    })
+  ],
+  disableDefaults: [
+    ConverterId.MAC,
+  ],
+})
+```
+
 > This is obviously a contrived example since it doesn't do anythig, but shows how a custom converter works.
 
 ## Title Case

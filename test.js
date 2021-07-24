@@ -1,5 +1,12 @@
 const { NameCaseConverter, Converter, ConverterId, IgnoreRule, toNameCase, toTitleCase } = require('.')
 
+NameCaseConverter.setGlobalOptions({
+  ignores: [
+    IgnoreRule.exact('TRIGGER_GLOBAL'),
+    IgnoreRule.regex(/^G{3,}/),
+  ]
+})
+
 test('Ensure standard names come back as title cased', () => {
   const converter = new NameCaseConverter('robbins')
   const result = converter.toString()
@@ -87,4 +94,10 @@ test('Ensure functional API exports and runs correctly', () => {
   expect(toNameCase('frodo baggins d\'artagnan saint-claire')).toBe('Frodo Baggins d\'Artagnan Saint-Claire')
   expect(toTitleCase('frodo')).toBe('Frodo')
   expect(toTitleCase('the fellowship of the ring')).toBe('The Fellowship of the Ring')
+})
+
+test('Ensure global options are set', () => {
+  expect(toNameCase('TRIGGER_GLOBAL')).toBe('TRIGGER_GLOBAL')
+  expect(toNameCase('GGG')).toBe('GGG')
+  expect(toNameCase('GG')).toBe('Gg')
 })

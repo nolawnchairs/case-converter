@@ -84,6 +84,10 @@ export declare class NameCaseConverter {
    * Converts a string to Title Case
    */
   static toTitleCase(word: string): string
+  /**
+   * Set configuration options globally
+   */
+  static setGlobalOptions(options: NameCaseConverterOptions): void
 }
 
 

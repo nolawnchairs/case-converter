@@ -122,6 +122,9 @@ export class NameCaseConverter {
 
   private readonly input: string = ''
   private readonly enabledConverters: Converter[]
+  private readonly options: NameCaseConverterOptions
+
+  private static globalOptions: NameCaseConverterOptions = {}
 
   /**
    * Creates an instance of NameCaseConverter.
@@ -129,11 +132,19 @@ export class NameCaseConverter {
    * @param {NameCaseConverterOptions} [options] an optional object of options to apply
    * @memberof NameCaseConverter
    */
-  constructor(
-    input: string,
-    readonly options?: NameCaseConverterOptions) {
+  constructor(input: string, options?: NameCaseConverterOptions) {
+
+    const { converters = [], ignores = [], disableDefault } = options ?? {}
+    const { converters: globalConverters = [], ignores: globalIgnores = [] } = NameCaseConverter.globalOptions
+
     this.input = input.trim()
-    this.enabledConverters = [...options?.converters ?? [], ...Object.entries(defaultConverters)
+    this.options = {
+      ignores: [...ignores, ...globalIgnores],
+      converters: [...converters, ...globalConverters],
+      disableDefault,
+    }
+
+    this.enabledConverters = [...this.options.converters ?? [], ...Object.entries(defaultConverters)
       .filter(([id]) => {
         if (options?.disableDefault) {
           if (typeof options.disableDefault === 'boolean')
@@ -174,7 +185,7 @@ export class NameCaseConverter {
   private parseWord(word: string, accumulated: string[]): string {
 
     // Match any ignore rules provided in the options
-    for (const rule of this.options?.ignores ?? []) {
+    for (const rule of this.options.ignores ?? []) {
       if (typeof rule.matcher == 'string' && this.matches(word, rule.matcher, rule.caseInsensitive)) {
         return word
       } else if (rule.matcher instanceof RegExp) {
@@ -217,6 +228,17 @@ export class NameCaseConverter {
       }).toString()
     }
     return input.charAt(0).toUpperCase() + input.substring(1, input.length).toLowerCase()
+  }
+
+  /**
+   * Set options globally
+   *
+   * @static
+   * @param {NameCaseConverterOptions} options
+   * @memberof NameCaseConverter
+   */
+  static setGlobalOptions(options: NameCaseConverterOptions) {
+    NameCaseConverter.globalOptions = options
   }
 
   /**
