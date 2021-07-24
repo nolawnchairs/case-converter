@@ -1,4 +1,4 @@
-const { NameCaseConverter, Converter, IgnoreRule, toNameCase, toTitleCase } = require('.')
+const { NameCaseConverter, Converter, ConverterId, IgnoreRule, toNameCase, toTitleCase } = require('.')
 
 test('Ensure standard names come back as title cased', () => {
   const converter = new NameCaseConverter('robbins')
@@ -56,13 +56,17 @@ test('Ensure regex-based ingore rules indeed bypass conversion', () => {
 })
 
 test('Ensure default converter omission works', () => {
-  const make = (value) => new NameCaseConverter(value, {
-    disableDefault: true
-  })
+  const make = (value, disableDefault = true) => new NameCaseConverter(value, { disableDefault })
 
   expect(make('frodo baggins').toString()).toBe('Frodo Baggins')
   expect(make('john mcclane').toString()).toBe('John Mcclane')
   expect(make(`Paddy o'brien`).toString()).toBe('Paddy O\'brien')
+  expect(make('henry viii', false).toString()).toBe('Henry VIII')
+
+  expect(make('john mcclane', [ConverterId.MC_MAC]).toString()).toBe('John Mcclane')
+  expect(make('saint-claire', [ConverterId.HYPENATED]).toString()).toBe('Saint-claire')
+  expect(make(`l'amour o'brien`, [ConverterId.DLO_APOSTRAPHE]).toString()).toBe(`L'amour O'brien`)
+  expect(make('Henry VIII', [ConverterId.ROMAN_NUMERALS]).toString()).toBe('Henry Viii')
 })
 
 test('Ensure custom operator works', () => {

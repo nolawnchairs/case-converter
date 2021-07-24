@@ -105,7 +105,8 @@ const defaultConverters: Record<ConverterId, Converter> = {
       ? chunk.charAt(0) + '\'' + suffix
       : chunk.charAt(0).toUpperCase() + '\'' + suffix
   }),
-  [ConverterId.ROMAN_NUMERALS]: new Converter(/XXXXXX/, w => w)
+  [ConverterId.ROMAN_NUMERALS]: new Converter(/^(?=[MDCLXVI])M*D?C{0,4}L?X{0,4}V?I{0,4}$/i,
+    chunk => chunk.toUpperCase())
 }
 
 /**
