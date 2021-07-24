@@ -61,7 +61,7 @@ IgnoreRule.exact(['Frodo', 'Sam', 'Merry'])
 The operator callback function provides the following arguments:
 
 ```typescript
-(chunk: string, index: number, options: NameCaseConverterOptions) => string
+function (chunk: string, index: number, options: NameCaseConverterOptions) => string
 ```
 
 `chunk` - The unaltered string chunk that was matched via regex
