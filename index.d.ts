@@ -2,9 +2,9 @@
 
 export declare type ConverterOperator = (chunk: string, index: number, accumulated: string[], options: NameCaseConverterOptions) => string
 
-export declare class CustomConverter {
+export declare class Converter {
   /**
-   * Creates an instance of CustomConverter. Provide a regex matcher and
+   * Creates an instance of Converter. Provide a regex matcher and
    * an operator function. The operator function supplies a string that was matched to the provided regex
    * and returns the final value to apply to the output
    */
@@ -46,7 +46,23 @@ export declare interface NameCaseConverterOptions {
   /**
    * An array of custom converters to apply
    */
-  converters?: CustomConverter[]
+  converters?: Converter[]
+  /**
+   * An array of ConverterId enum values corresponding to any
+   * default converters to disable, or TRUE to disable all default
+   * converters
+   */
+  disableDefault?: ConverterId[] | boolean
+}
+
+/**
+ * Enumeration of the built-in converters
+ */
+export enum ConverterId {
+  HYPENATED,
+  MC_MAC,
+  DLO_APOSTRAPHE,
+  ROMAN_NUMERALS,
 }
 
 /**
@@ -95,7 +111,7 @@ export declare function createIgnoreRule(matcher: string[], caseInsensitive?: bo
  */
 export declare function createIgnoreRule(matcher: RegExp): IgnoreRule;
 /**
- * Creates an instance of CustomConverter.
+ * Creates an instance of Converter.
  */
-export declare function createConverter(regex: RegExp, callback: (value: string, chunkIndex: number) => string): CustomConverter;
+export declare function createConverter(regex: RegExp, callback: (value: string, chunkIndex: number) => string): Converter;
 

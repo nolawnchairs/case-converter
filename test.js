@@ -1,4 +1,4 @@
-const { NameCaseConverter, CustomConverter, IgnoreRule, toNameCase, toTitleCase } = require('.')
+const { NameCaseConverter, Converter, IgnoreRule, toNameCase, toTitleCase } = require('.')
 
 test('Ensure standard names come back as title cased', () => {
   const converter = new NameCaseConverter('robbins')
@@ -55,9 +55,19 @@ test('Ensure regex-based ingore rules indeed bypass conversion', () => {
   expect(result).toBe('Al-shalah')
 })
 
+test('Ensure default converter omission works', () => {
+  const make = (value) => new NameCaseConverter(value, {
+    disableDefault: true
+  })
+
+  expect(make('frodo baggins').toString()).toBe('Frodo Baggins')
+  expect(make('john mcclane').toString()).toBe('John Mcclane')
+  expect(make(`Paddy o'brien`).toString()).toBe('Paddy O\'brien')
+})
+
 test('Ensure custom operator works', () => {
   const converter = new NameCaseConverter('Dave DeSantos', {
-    converters: [new CustomConverter(/^De[A-Z][a-z]+$/, (w, i) => `${w}_${i}`)]
+    converters: [new Converter(/^De[A-Z][a-z]+$/, (w, i) => `${w}_${i}`)]
   })
   const result = converter.toString()
   expect(result).toBe('Dave DeSantos_1')

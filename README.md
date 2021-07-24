@@ -39,6 +39,7 @@ The `NameCaseConverter` constructor takes an optional object as the second param
 interface NameCaseConverterOptions {
   ignores?: IgnoreRule[]
   converters?: Converter[]
+  disableDefault?: ConverterId[] | boolean
 }
 ```
 
@@ -88,6 +89,15 @@ const converter = new NameCaseConverter('Dave DeSantos', {
 })
 const result = converter.toString()
 console.log(result) // "Dave DeSantos"
+```
+
+`disableDefault` - Provide an array of `ConverterId` enum values to selectively disable built-in converters, or supply `true` to disable all built-in converters. Supplying false will therefore have no effect.
+
+```typescript
+const converter = NameCaseConverter.toTitleCase('mcclane', {
+  disableDefault: [ConverterId.MC_MAC]
+})
+console.log(converter.toString()) // "Mcclane"
 ```
 
 > This is obviously a contrived example since it doesn't do anythig, but shows how a custom converter works.

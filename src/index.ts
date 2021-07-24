@@ -1,15 +1,15 @@
 
 export type ConverterOperator = (chunk: string, index: number, accumulated: string[], options: NameCaseConverterOptions) => string
 
-export class CustomConverter {
+export class Converter {
   /**
-   * Creates an instance of CustomConverter. Provide a regex matcher and
+   * Creates an instance of Converter. Provide a regex matcher and
    * an operator function. The operator function supplies a string that was matched to the provided regex
    * and returns the final value to apply to the output
    *
    * @param {RegExp} regex the regex that will be matched against input strings
    * @param {ConverterOperator} operator a function that returns the desired output
-   * @memberof CustomConverter
+   * @memberof Converter
    */
   constructor(
     readonly regex: RegExp,
@@ -75,27 +75,38 @@ export class IgnoreRule {
  */
 export interface NameCaseConverterOptions {
   ignores?: IgnoreRule[]
-  converters?: CustomConverter[]
+  converters?: Converter[]
+  disableDefault?: ConverterId[] | boolean
+}
+/**
+ * Enumeration of build-in converters
+ *
+ * @export
+ * @enum {number}
+ */
+export enum ConverterId {
+  HYPENATED,
+  MC_MAC,
+  DLO_APOSTRAPHE,
+  ROMAN_NUMERALS,
 }
 
 /**
- * Built-in converters
+ * Build in converter mappings
  */
-const defaultConverters = [
-  // Hyphenated words
-  new CustomConverter(/-/, (chunk, _, __, options) => chunk.split('-').map(p => p.trim())
+const defaultConverters: Record<ConverterId, Converter> = {
+  [ConverterId.HYPENATED]: new Converter(/-/, (chunk, _, __, options) => chunk.split('-').map(p => p.trim())
     .map(part => new NameCaseConverter(part, options).toString()).join('-')),
-  // Words starting with Mc or Mac
-  new CustomConverter(/^ma?c[A-Za-z]+$/i, chunk =>
+  [ConverterId.MC_MAC]: new Converter(/^ma?c[A-Za-z]+$/i, chunk =>
     chunk.replace(/^(ma?c)([A-Za-z]+)$/i, '$1 $2').split(' ').map(p => NameCaseConverter.toTitleCase(p)).join('')),
-  // Words starting with L, O or D plus apostrophe
-  new CustomConverter(/^[ldo]\'/i, (chunk, index) => {
+  [ConverterId.DLO_APOSTRAPHE]: new Converter(/^[ldo]\'/i, (chunk, index) => {
     const suffix = NameCaseConverter.toTitleCase(chunk.substring(2, chunk.length))
     return index
       ? chunk.charAt(0) + '\'' + suffix
       : chunk.charAt(0).toUpperCase() + '\'' + suffix
-  })
-]
+  }),
+  [ConverterId.ROMAN_NUMERALS]: new Converter(/XXXXXX/, w => w)
+}
 
 /**
  * The base NameCaseConverter class
@@ -105,7 +116,8 @@ const defaultConverters = [
  */
 export class NameCaseConverter {
 
-  private input: string = ''
+  private readonly input: string = ''
+  private readonly enabledConverters: Converter[]
 
   /**
    * Creates an instance of NameCaseConverter.
@@ -117,6 +129,16 @@ export class NameCaseConverter {
     input: string,
     readonly options?: NameCaseConverterOptions) {
     this.input = input.trim()
+    this.enabledConverters = [...options?.converters ?? [], ...Object.entries(defaultConverters)
+      .filter(([id]) => {
+        if (options?.disableDefault) {
+          if (typeof options.disableDefault === 'boolean')
+            return false
+          return options.disableDefault.findIndex(i => i == Number(id)) >= 0
+        }
+        return true
+      })
+      .map(([_, converter]) => converter)]
   }
 
   /**
@@ -146,26 +168,22 @@ export class NameCaseConverter {
    * @memberof NameCaseConverter
    */
   private parseWord(word: string, accumulated: string[]): string {
+
     // Match any ignore rules provided in the options
-    if (this.options?.ignores?.length) {
-      for (const rule of this.options.ignores) {
-        if (typeof rule.matcher == 'string' && this.matches(word, rule.matcher, rule.caseInsensitive)) {
+    for (const rule of this.options?.ignores ?? []) {
+      if (typeof rule.matcher == 'string' && this.matches(word, rule.matcher, rule.caseInsensitive)) {
+        return word
+      } else if (rule.matcher instanceof RegExp) {
+        if (rule.matcher.test(word))
           return word
-        } else if (rule.matcher instanceof RegExp) {
-          if (rule.matcher.test(word))
-            return word
-        } else if (Array.isArray(rule.matcher)) {
-          if (rule.matcher.find(s => this.matches(word, s, rule.caseInsensitive)))
-            return word
-        }
+      } else if (Array.isArray(rule.matcher)) {
+        if (rule.matcher.find(s => this.matches(word, s, rule.caseInsensitive)))
+          return word
       }
     }
 
-    // Merge provided custom converters with default converters
-    const converters = [...(this.options?.converters ?? []), ...defaultConverters]
-
     // Run through converters
-    for (const converter of converters) {
+    for (const converter of this.enabledConverters) {
       if (converter.regex.test(word)) {
         return converter.operator(word, accumulated.length, accumulated, this.options)
       }
@@ -188,7 +206,7 @@ export class NameCaseConverter {
     if (/\s+/.test(input)) {
       return new NameCaseConverter(input, {
         converters: [
-          new CustomConverter(/^(a|an|the|to|in|on|of|from|and|with)$/i, (chunk, index) => {
+          new Converter(/^(a|an|the|to|in|on|of|from|and|with)$/i, (chunk, index) => {
             return index ? chunk.toLowerCase() : NameCaseConverter.toTitleCase(chunk)
           })
         ]
@@ -251,13 +269,13 @@ export function createIgnoreRule(matcher: string | string[] | RegExp, caseInsens
 }
 
 /**
- * Creates an instance of CustomConverter.
+ * Creates an instance of Converter.
  *
  * @export
  * @param {RegExp} regex the regex that will be matched against input strings
  * @param {(value: string, chunkIndex: number) => string} callback a function that returns the desired output
- * @return {*}  {CustomConverter}
+ * @return {*}  {Converter}
  */
-export function createConverter(regex: RegExp, callback: (value: string, chunkIndex: number) => string): CustomConverter {
-  return new CustomConverter(regex, callback)
+export function createConverter(regex: RegExp, callback: (value: string, chunkIndex: number) => string): Converter {
+  return new Converter(regex, callback)
 }
