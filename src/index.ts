@@ -135,6 +135,7 @@ export class NameCaseConverter {
     }
     return accumulated.join(' ')
   }
+
   /**
    * Converts a string to Title Case
    *
