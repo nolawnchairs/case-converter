@@ -1,6 +1,6 @@
 {
   "name": "@nolawnchairs/case-converter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Parses proper names and titles into their proper letter case",
   "main": "index.js",
   "author": "Michael Wieczorek <nolawnchairs@gmail.com>",
