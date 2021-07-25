@@ -79,7 +79,7 @@ export declare class CaseConverter {
    * Processes each space-separated part of the input
    * into proper name-case
    */
-  convert(input: string): string
+  toNameCase(input: string): string
   /**
    * Converts a string to Title Case
    */
