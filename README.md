@@ -152,6 +152,15 @@ console.log(titleCased) // "Lord of the Rings"
 
 While these two methods ostensibly do the same thing, name case is designed for converting people's names and allows granular control over string conversion via `IgnoreRule` and `Converter` implementations provided to it. Title case, on the other hand is not configurable, and is designed for converting sentences such as movie and book titles.
 
+Let's put that same string from the last example above through the standard name case converter and see what happens:
+
+```typescript
+const nameCased = new CaseConverter().toNameCase('lord of the rings')
+console.log(nameCased) // "Lord Of The Rings"
+```
+
+Note that both `of` and `the` were treated as proper names, hence uppercased first letter, which is no ideal for actual titles.
+
 If you wish to add your own rules as to which words will be forced to lowercase, you can create a new instance of `CaseConverter` with your regular expression defined as a custom converter (which is what this method actually does internally):
 
 ```typescript

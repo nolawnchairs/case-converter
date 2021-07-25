@@ -87,6 +87,11 @@ test('Ensure title case works for multiple words', () => {
   expect(CaseConverter.toTitleCase('OF MICE AND MEN')).toBe('Of Mice and Men')
 })
 
+test('Ensure name case is no suitable for titles', () => {
+  expect(new CaseConverter().toNameCase('lord of the rings')).toBe('Lord Of The Rings')
+  expect(new CaseConverter().toNameCase('OF MICE AND MEN')).toBe('Of Mice And Men')
+})
+
 
 test('Ensure functional API exports and runs correctly', () => {
   expect(toNameCase('frodo baggins d\'artagnan saint-claire')).toBe('Frodo Baggins d\'Artagnan Saint-Claire')
