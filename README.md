@@ -1,4 +1,4 @@
-# Name Case Converter
+# Case Converter
 
 A simple, no-dependency library that will convert strings to proper name title case. Useful for standardizing user input that may be entered in all lowercase or all uppercase.
 
@@ -22,8 +22,8 @@ Instantiate an instance with an optional `options` parameter to the constructor 
 
 ```typescript
 
-const converter = new NameCaseConverter()
-const cased = converter.convert('fordo baggins')
+const converter = new CaseConverter()
+const cased = converter.toNameCase('fordo baggins')
 console.log(cased) // "Frodo Baggins"
 ```
 
@@ -34,10 +34,10 @@ The built-in converters are called in the following order:
 
 ## Options
 
-The `NameCaseConverter` constructor takes an optional object as its parameter.
+The `CaseConverter` constructor takes an optional object as its parameter.
 
 ```typescript
-interface NameCaseConverterOptions {
+interface CaseConverterOptions {
   ignores?: IgnoreRule[]
   converters?: Converter[]
   disableDefault?: ConverterId[] | boolean
@@ -63,7 +63,7 @@ IgnoreRule.exact(['Frodo', 'Sam', 'Merry'])
 The operator callback function provides the following arguments:
 
 ```typescript
-function (chunk: string, index: number, accumulated: string[], options: NameCaseConverterOptions) => string
+function (chunk: string, index: number, accumulated: string[], options: CaseConverterOptions) => string
 ```
 
 `chunk` - The unaltered string chunk that was matched via regex
@@ -72,7 +72,7 @@ function (chunk: string, index: number, accumulated: string[], options: NameCase
 
 `accumulated` - A string array of the chunks already converted. Useful if the action to take on the current chunk depends on previous results of the iteration.
 
-`options` - The `NameCaseConverterOptions` object provided. This can be useful if you need to pass options down to another conversion layer using the same configuration to any recursive implementations of `NameCaseConverter` within your custom converter
+`options` - The `CaseConverterOptions` object provided. This can be useful if you need to pass options down to another conversion layer using the same configuration to any recursive implementations of `CaseConverter` within your custom converter
 
 ```typescript
 new Converter(/^Mac[^aeiou]/, (value, index) => {
@@ -80,7 +80,7 @@ new Converter(/^Mac[^aeiou]/, (value, index) => {
 })
 
 // An example leveraging chunk index
-const converter = new NameCaseConverter({
+const converter = new CaseConverter({
   converters: [
     new Converter(/^De[A-Za-z]+$/, (chunk, index, accumulated) => {
       console.log(chunk, index, accumulated) // "DeSantos", 1, ["Dave"]
@@ -88,7 +88,7 @@ const converter = new NameCaseConverter({
     })
   ]
 })
-const result = converter.convert('Dave DeSantos')
+const result = converter.toNameCase('Dave DeSantos')
 console.log(result) // "Dave DeSantos"
 ```
 
@@ -103,10 +103,10 @@ export enum ConverterId {
   ROMAN_NUMERALS,
 }
 
-const converter = NameCaseConverter.toTitleCase({
+const converter = CaseConverter.toTitleCase({
   disableDefault: [ConverterId.MC]
 })
-console.log(converter.convert('mcclane')) // "Mcclane"
+console.log(converter.toNameCase('mcclane')) // "Mcclane"
 ```
 
 ## Global Options
@@ -114,7 +114,7 @@ console.log(converter.convert('mcclane')) // "Mcclane"
 Options can be applied globally. Any options passed to converters will be merged with global options, with user-defined options taking precedence. Any Converters or IgnoreRules passed to converters will be added to those set globally and will also take precedence.
 
 ```typescript
-NameCaseConverter.setGlobalOptions({
+CaseConverter.setGlobalOptions({
   converters: [
     new Converter(/^De[A-Za-z]+$/, (chunk, index, accumulated) => {
       console.log(chunk, index, accumulated) // "DeSantos", 1, ["Dave"]
@@ -134,17 +134,17 @@ NameCaseConverter.setGlobalOptions({
 The API also exposes a simple static title-case method. It will properly title case a word or all words in a sentence. If the input is a single word it will be capitalized indiscriminantly:
 
 ```typescript
-const titleCased = NameCaseConverter.toTitleCase('frodo')
+const titleCased = CaseConverter.toTitleCase('frodo')
 console.log(titleCased) // "Frodo"
 
-const titleCased2 = NameCaseConverter.toTitleCase('McClane')
+const titleCased2 = CaseConverter.toTitleCase('McClane')
 console.log(titleCased2) // "Mcclane"
 ```
 
 If the input contains one or more spaces, each word passed through the default name case conversion layer, applying the  built-in rule sets without additional configuration. Common articles, conjunctions and prepositions are converted to lowercase:
 
 ```typescript
-const titleCased = NameCaseConverter.toTitleCase('lord of the rings')
+const titleCased = CaseConverter.toTitleCase('lord of the rings')
 console.log(titleCased) // "Lord of the Rings"
 ```
 
@@ -152,14 +152,14 @@ console.log(titleCased) // "Lord of the Rings"
 
 While these two methods ostensibly do the same thing, name case is designed for converting people's names and allows granular control over string conversion via `IgnoreRule` and `Converter` implementations provided to it. Title case, on the other hand is not configurable, and is designed for converting sentences such as movie and book titles.
 
-If you wish to add your own rules as to which words will be forced to lowercase, you can create a new instance of `NameCaseConverter` with your regular expression defined as a custom converter (which is what this method actually does internally):
+If you wish to add your own rules as to which words will be forced to lowercase, you can create a new instance of `CaseConverter` with your regular expression defined as a custom converter (which is what this method actually does internally):
 
 ```typescript
-new NameCaseConverter(input, {
+new CaseConverter(input, {
   converters: [
     new Converter(/^(whichever|words|you|want|to|be|forced|to|lowercase)$/i, (chunk, index) => {
       // The first chunk (word) passed will be title-cased, all others will be converted to lowercase
-      return index ? chunk.toLowerCase() : NameCaseConverter.toTitleCase(chunk)
+      return index ? chunk.toLowerCase() : CaseConverter.toTitleCase(chunk)
     })
   ]
 })
@@ -170,17 +170,17 @@ new NameCaseConverter(input, {
 For those who prefer a functional approach, the following functions are available:
 
 ### `toNameCase`
-Converts a string and (all words) to a proper name-cased string. Alias for `new NameCaseConverter().convert(word)`
+Converts a string and (all words) to a proper name-cased string. Alias for `new CaseConverter().toNameCase(word)`
 
 ```typescript
 function toNameCase(): string
-function toNameCase(options: NameCaseConverterOptions): string
+function toNameCase(options: CaseConverterOptions): string
 
 console.log(toNameCase('john mclane')) // "John McClane"
 ```
 
 ### `toTitleCase`
-Converts a single word to Title Case. Alias for `NameCaseConverter.toTitleCase(word)`
+Converts a single word to Title Case. Alias for `CaseConverter.toTitleCase(word)`
 
 ```typescript
 function toTitleCase(input: string): string
@@ -189,7 +189,7 @@ console.log(toTitleCase('LORD OF THE RINGS')) // "Lord of the Rings"
 ```
 
 ### `createIgnoreRule`
-Creates an instance of an `IgnoreRule` for customizing `toNameCase` or `new NameCaseConverter()`. The optional `caseInsensitive` parameter for the string-based overloads will default to `false` if not provided.
+Creates an instance of an `IgnoreRule` for customizing `toNameCase` or `new CaseConverter()`. The optional `caseInsensitive` parameter for the string-based overloads will default to `false` if not provided.
 
 ```typescript
 function createIgnoreRule(matcher: string, caseInsensitive?: boolean): IgnoreRule;

@@ -1,5 +1,5 @@
 
-export type ConverterOperator = (chunk: string, index: number, accumulated: string[], options: NameCaseConverterOptions) => string
+export type ConverterOperator = (chunk: string, index: number, accumulated: string[], options: CaseConverterOptions) => string
 
 export class Converter {
   /**
@@ -68,12 +68,12 @@ export class IgnoreRule {
 }
 
 /**
- * Options for the NameCaseConverter instance
+ * Options for the CaseConverter instance
  *
  * @export
- * @interface NameCaseConverterOptions
+ * @interface CaseConverterOptions
  */
-export interface NameCaseConverterOptions {
+export interface CaseConverterOptions {
   ignores?: IgnoreRule[]
   converters?: Converter[]
   disableDefault?: ConverterId[] | boolean
@@ -97,7 +97,7 @@ export enum ConverterId {
  */
 const defaultConverters: Record<ConverterId, Converter> = {
   [ConverterId.HYPENATED]: new Converter(/-/, (chunk, _, __, options) => chunk.split('-').map(p => p.trim())
-    .map(part => new NameCaseConverter(options).convert(part)).join('-')),
+    .map(part => new CaseConverter(options).toNameCase(part)).join('-')),
   [ConverterId.MC]: new Converter(/^mc[A-Za-z]+$/i, chunk =>
     chunk.replace(/^(mc)([A-Za-z]+)$/i, '$1 $2').split(' ').map(p => toTitleCase(p)).join('')),
   [ConverterId.MAC]: new Converter(/^mac[A-Za-z]+$/i, chunk =>
@@ -113,27 +113,27 @@ const defaultConverters: Record<ConverterId, Converter> = {
 }
 
 /**
- * The base NameCaseConverter class
+ * The base CaseConverter class
  *
  * @export
- * @class NameCaseConverter
+ * @class CaseConverter
  */
-export class NameCaseConverter {
+export class CaseConverter {
 
   private readonly enabledConverters: Converter[]
-  private readonly options: NameCaseConverterOptions
+  private readonly options: CaseConverterOptions
 
-  private static globalOptions: NameCaseConverterOptions = {}
+  private static globalOptions: CaseConverterOptions = {}
 
   /**
-   * Creates an instance of NameCaseConverter.
-   * @param {NameCaseConverterOptions} [options] an optional object of options to apply
-   * @memberof NameCaseConverter
+   * Creates an instance of CaseConverter.
+   * @param {CaseConverterOptions} [options] an optional object of options to apply
+   * @memberof CaseConverter
    */
-  constructor(options?: NameCaseConverterOptions) {
+  constructor(options?: CaseConverterOptions) {
 
     const { converters = [], ignores = [], disableDefault } = options ?? {}
-    const { converters: globalConverters = [], ignores: globalIgnores = [] } = NameCaseConverter.globalOptions
+    const { converters: globalConverters = [], ignores: globalIgnores = [] } = CaseConverter.globalOptions
 
     this.options = {
       ignores: [...ignores, ...globalIgnores],
@@ -159,9 +159,9 @@ export class NameCaseConverter {
    *
    * @return {*}  {string}
    * @param {string} input the value to convert
-   * @memberof NameCaseConverter
+   * @memberof CaseConverter
    */
-  convert(input: string): string {
+  toNameCase(input: string): string {
     const words = input.trim().split(/\s+/)
     const accumulated: string[] = []
     for (const word of words) {
@@ -178,7 +178,7 @@ export class NameCaseConverter {
    * @param {string} word the input string
    * @param {number} chunkIndex the index of the current chunk being processed
    * @return {*}  {string}
-   * @memberof NameCaseConverter
+   * @memberof CaseConverter
    */
   private parseWord(word: string, accumulated: string[]): string {
 
@@ -203,7 +203,7 @@ export class NameCaseConverter {
     }
 
     // Simply return a title cased string in any other case
-    return NameCaseConverter.toTitleCase(word)
+    return CaseConverter.toTitleCase(word)
   }
 
   /**
@@ -213,17 +213,17 @@ export class NameCaseConverter {
    * @static
    * @param {string} input the input string
    * @return {*}  {string}
-   * @memberof NameCaseConverter
+   * @memberof CaseConverter
    */
   static toTitleCase(input: string): string {
     if (/\s+/.test(input)) {
-      return new NameCaseConverter({
+      return new CaseConverter({
         converters: [
           new Converter(/^(a|an|the|to|in|on|of|from|and|with)$/i, (chunk, index) => {
-            return index ? chunk.toLowerCase() : NameCaseConverter.toTitleCase(chunk)
+            return index ? chunk.toLowerCase() : CaseConverter.toTitleCase(chunk)
           })
         ]
-      }).convert(input)
+      }).toNameCase(input)
     }
     return input.charAt(0).toUpperCase() + input.substring(1, input.length).toLowerCase()
   }
@@ -232,11 +232,11 @@ export class NameCaseConverter {
    * Set options globally
    *
    * @static
-   * @param {NameCaseConverterOptions} options
-   * @memberof NameCaseConverter
+   * @param {CaseConverterOptions} options
+   * @memberof CaseConverter
    */
-  static setGlobalOptions(options: NameCaseConverterOptions) {
-    NameCaseConverter.globalOptions = options
+  static setGlobalOptions(options: CaseConverterOptions) {
+    CaseConverter.globalOptions = options
   }
 
   /**
@@ -247,7 +247,7 @@ export class NameCaseConverter {
    * @param {string} v2 the second value
    * @param {boolean} ci whether to match as case-insensitive
    * @return {*}  {boolean}
-   * @memberof NameCaseConverter
+   * @memberof CaseConverter
    */
   private matches(v1: string, v2: string, ci: boolean): boolean {
     return ci
@@ -261,12 +261,12 @@ export class NameCaseConverter {
  *
  * @export
  * @param {string} input the input value to convert
- * @param {NameCaseConverterOptions} [options] an optional object of options to apply
+ * @param {CaseConverterOptions} [options] an optional object of options to apply
  * @return {*}  {string}
  */
-export function toNameCase(input: string, options?: NameCaseConverterOptions): string {
-  const converter = new NameCaseConverter(options)
-  return converter.convert(input)
+export function toNameCase(input: string, options?: CaseConverterOptions): string {
+  const converter = new CaseConverter(options)
+  return converter.toNameCase(input)
 }
 
 /**
@@ -277,7 +277,7 @@ export function toNameCase(input: string, options?: NameCaseConverterOptions): s
  * @return {*}  {string}
  */
 export function toTitleCase(input: string): string {
-  return NameCaseConverter.toTitleCase(input)
+  return CaseConverter.toTitleCase(input)
 }
 
 /**

@@ -1,6 +1,6 @@
 
 
-export declare type ConverterOperator = (chunk: string, index: number, accumulated: string[], options: NameCaseConverterOptions) => string
+export declare type ConverterOperator = (chunk: string, index: number, accumulated: string[], options: CaseConverterOptions) => string
 
 export declare class Converter {
   /**
@@ -35,9 +35,9 @@ export declare class IgnoreRule {
 }
 
 /**
- * Options for the NameCaseConverter instance
+ * Options for the CaseConverter instance
  */
-export declare interface NameCaseConverterOptions {
+export declare interface CaseConverterOptions {
   /**
    * An array of rules that dictate what strings to ignore,
    * and simply return unaltered
@@ -67,14 +67,14 @@ export enum ConverterId {
 }
 
 /**
- * The base NameCaseConverter class
+ * The base CaseConverter class
  */
-export declare class NameCaseConverter {
+export declare class CaseConverter {
   /**
-   * Creates an instance of NameCaseConverter.
+   * Creates an instance of CaseConverter.
    */
   constructor();
-  constructor(options: NameCaseConverterOptions);
+  constructor(options: CaseConverterOptions);
   /**
    * Processes each space-separated part of the input
    * into proper name-case
@@ -87,7 +87,7 @@ export declare class NameCaseConverter {
   /**
    * Set configuration options globally
    */
-  static setGlobalOptions(options: NameCaseConverterOptions): void
+  static setGlobalOptions(options: CaseConverterOptions): void
 }
 
 
@@ -98,7 +98,7 @@ export declare function toNameCase(input: string): string;
 /**
  * Converts an input string to the proper name-cased value
  */
-export declare function toNameCase(input: string, options: NameCaseConverterOptions): string;
+export declare function toNameCase(input: string, options: CaseConverterOptions): string;
 /**
  * Converts a string to Title Case
  */

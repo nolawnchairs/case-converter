@@ -1,6 +1,6 @@
-const { NameCaseConverter, Converter, ConverterId, IgnoreRule, toNameCase, toTitleCase } = require('.')
+const { CaseConverter, Converter, ConverterId, IgnoreRule, toNameCase, toTitleCase } = require('.')
 
-NameCaseConverter.setGlobalOptions({
+CaseConverter.setGlobalOptions({
   ignores: [
     IgnoreRule.exact('TRIGGER_GLOBAL'),
     IgnoreRule.regex(/^G{3,}/),
@@ -24,44 +24,44 @@ test('Ensure names starting with L\', O\' or D\' is properly cased', () => {
 })
 
 test('Ensure hyphenized names are properly cased', () => {
-  const converter = new NameCaseConverter()
-  const result = converter.convert(`saint-claire royce-Calvert d'arne-SMITH ROLLS-ROYCE`)
+  const converter = new CaseConverter()
+  const result = converter.toNameCase(`saint-claire royce-Calvert d'arne-SMITH ROLLS-ROYCE`)
   expect(result).toBe(`Saint-Claire Royce-Calvert D'Arne-Smith Rolls-Royce`)
 })
 
 test('Ensure string-based ingore rules indeed bypass conversion', () => {
-  const converter = new NameCaseConverter({
+  const converter = new CaseConverter({
     ignores: [
       IgnoreRule.insensitive('mixedcaseword')
     ]
   })
-  const result = converter.convert('MIXEDcaseWord')
+  const result = converter.toNameCase('MIXEDcaseWord')
   expect(result).toBe('MIXEDcaseWord')
 })
 
 test('Ensure string-array-based ingore rules indeed bypass conversion', () => {
-  const converter = new NameCaseConverter({
+  const converter = new CaseConverter({
     ignores: [
       IgnoreRule.insensitive(['frodo', 'baggins'])
     ]
   })
-  const result = converter.convert('FRODO baggins')
+  const result = converter.toNameCase('FRODO baggins')
   expect(result).toBe('FRODO baggins')
   expect(result).not.toBe('Frodo Baggins')
 })
 
 test('Ensure regex-based ingore rules indeed bypass conversion', () => {
-  const converter = new NameCaseConverter({
+  const converter = new CaseConverter({
     ignores: [
       IgnoreRule.regex(/^al-/i)
     ]
   })
-  const result = converter.convert('Al-shalah')
+  const result = converter.toNameCase('Al-shalah')
   expect(result).toBe('Al-shalah')
 })
 
 test('Ensure default converter omission works', () => {
-  const make = (value, disableDefault = true) => new NameCaseConverter({ disableDefault }).convert(value)
+  const make = (value, disableDefault = true) => new CaseConverter({ disableDefault }).toNameCase(value)
 
   expect(make('frodo baggins')).toBe('Frodo Baggins')
   expect(make('john mcclane')).toBe('John Mcclane')
@@ -75,16 +75,16 @@ test('Ensure default converter omission works', () => {
 })
 
 test('Ensure custom operator works', () => {
-  const converter = new NameCaseConverter({
+  const converter = new CaseConverter({
     converters: [new Converter(/^De[A-Z][a-z]+$/, (w, i) => `${w}_${i}`)]
   })
-  const result = converter.convert('Dave DeSantos')
+  const result = converter.toNameCase('Dave DeSantos')
   expect(result).toBe('Dave DeSantos_1')
 })
 
 test('Ensure title case works for multiple words', () => {
-  expect(NameCaseConverter.toTitleCase('lord of the rings')).toBe('Lord of the Rings')
-  expect(NameCaseConverter.toTitleCase('OF MICE AND MEN')).toBe('Of Mice and Men')
+  expect(CaseConverter.toTitleCase('lord of the rings')).toBe('Lord of the Rings')
+  expect(CaseConverter.toTitleCase('OF MICE AND MEN')).toBe('Of Mice and Men')
 })
 
 
