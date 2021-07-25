@@ -150,7 +150,7 @@ console.log(titleCased) // "Lord of the Rings"
 
 ### Title Case vs Name Case
 
-While these two methods ostensibly do the same thing, name case is designed for converting people's names and allows granular control over string conversion via `IgnoreRule` and `Converter` implementations provided to it. Title case, on the other hand is not configurable, and is designed for converting sentences such as movie and book titles.
+While these two methods ostensibly do the same thing, name case is designed for converting people's names and allows granular control over string conversion via `IgnoreRule` and `Converter` implementations provided to it. Title case, on the other hand is not directly configurable (but will inherit options set globally), and is designed for converting sentences such as movie and book titles.
 
 Let's put that same string from the last example above through the standard name case converter and see what happens:
 
