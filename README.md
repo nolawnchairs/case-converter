@@ -18,12 +18,12 @@ The functionality is biased towards proper English-language conventions.
 
 ## Basic Usage
 
-Provide a string of single or multiple words to the constructor
+Instantiate an instance with an optional `options` parameter to the constructor then pass a string of single or multiple words to the convert method:
 
 ```typescript
 
-const input = 'fordo baggins'
-const cased = new NameCaseConverter().convert(input)
+const converter = new NameCaseConverter()
+const cased = converter.convert('fordo baggins')
 console.log(cased) // "Frodo Baggins"
 ```
 
@@ -34,7 +34,7 @@ The built-in converters are called in the following order:
 
 ## Options
 
-The `NameCaseConverter` constructor takes an optional object as the second parameter.
+The `NameCaseConverter` constructor takes an optional object as its parameter.
 
 ```typescript
 interface NameCaseConverterOptions {
