@@ -23,7 +23,7 @@ Provide a string of single or multiple words to the constructor
 ```typescript
 
 const input = 'fordo baggins'
-const cased = new NameCaseConverter(input).toString()
+const cased = new NameCaseConverter().convert(input)
 console.log(cased) // "Frodo Baggins"
 ```
 
@@ -80,7 +80,7 @@ new Converter(/^Mac[^aeiou]/, (value, index) => {
 })
 
 // An example leveraging chunk index
-const converter = new NameCaseConverter('Dave DeSantos', {
+const converter = new NameCaseConverter({
   converters: [
     new Converter(/^De[A-Za-z]+$/, (chunk, index, accumulated) => {
       console.log(chunk, index, accumulated) // "DeSantos", 1, ["Dave"]
@@ -88,7 +88,7 @@ const converter = new NameCaseConverter('Dave DeSantos', {
     })
   ]
 })
-const result = converter.toString()
+const result = converter.convert('Dave DeSantos')
 console.log(result) // "Dave DeSantos"
 ```
 
@@ -103,10 +103,10 @@ export enum ConverterId {
   ROMAN_NUMERALS,
 }
 
-const converter = NameCaseConverter.toTitleCase('mcclane', {
+const converter = NameCaseConverter.toTitleCase({
   disableDefault: [ConverterId.MC]
 })
-console.log(converter.toString()) // "Mcclane"
+console.log(converter.convert('mcclane')) // "Mcclane"
 ```
 
 ## Global Options
@@ -170,11 +170,11 @@ new NameCaseConverter(input, {
 For those who prefer a functional approach, the following functions are available:
 
 ### `toNameCase`
-Converts a string and (all words) to a proper name-cased string. Alias for `new NameCaseConverter(word).toString()`
+Converts a string and (all words) to a proper name-cased string. Alias for `new NameCaseConverter().convert(word)`
 
 ```typescript
-function toNameCase(input: string): string
-function toNameCase(input: string, options: NameCaseConverterOptions): string
+function toNameCase(): string
+function toNameCase(options: NameCaseConverterOptions): string
 
 console.log(toNameCase('john mclane')) // "John McClane"
 ```

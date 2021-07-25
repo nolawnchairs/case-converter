@@ -97,7 +97,7 @@ export enum ConverterId {
  */
 const defaultConverters: Record<ConverterId, Converter> = {
   [ConverterId.HYPENATED]: new Converter(/-/, (chunk, _, __, options) => chunk.split('-').map(p => p.trim())
-    .map(part => new NameCaseConverter(part, options).toString()).join('-')),
+    .map(part => new NameCaseConverter(options).convert(part)).join('-')),
   [ConverterId.MC]: new Converter(/^mc[A-Za-z]+$/i, chunk =>
     chunk.replace(/^(mc)([A-Za-z]+)$/i, '$1 $2').split(' ').map(p => toTitleCase(p)).join('')),
   [ConverterId.MAC]: new Converter(/^mac[A-Za-z]+$/i, chunk =>
@@ -120,7 +120,6 @@ const defaultConverters: Record<ConverterId, Converter> = {
  */
 export class NameCaseConverter {
 
-  private readonly input: string = ''
   private readonly enabledConverters: Converter[]
   private readonly options: NameCaseConverterOptions
 
@@ -128,16 +127,14 @@ export class NameCaseConverter {
 
   /**
    * Creates an instance of NameCaseConverter.
-   * @param {string} input the input value to convert
    * @param {NameCaseConverterOptions} [options] an optional object of options to apply
    * @memberof NameCaseConverter
    */
-  constructor(input: string, options?: NameCaseConverterOptions) {
+  constructor(options?: NameCaseConverterOptions) {
 
     const { converters = [], ignores = [], disableDefault } = options ?? {}
     const { converters: globalConverters = [], ignores: globalIgnores = [] } = NameCaseConverter.globalOptions
 
-    this.input = input.trim()
     this.options = {
       ignores: [...ignores, ...globalIgnores],
       converters: [...converters, ...globalConverters],
@@ -161,10 +158,11 @@ export class NameCaseConverter {
    * into proper name-case
    *
    * @return {*}  {string}
+   * @param {string} input the value to convert
    * @memberof NameCaseConverter
    */
-  toString(): string {
-    const words = this.input.split(/\s+/)
+  convert(input: string): string {
+    const words = input.trim().split(/\s+/)
     const accumulated: string[] = []
     for (const word of words) {
       const current = this.parseWord(word, accumulated)
@@ -219,13 +217,13 @@ export class NameCaseConverter {
    */
   static toTitleCase(input: string): string {
     if (/\s+/.test(input)) {
-      return new NameCaseConverter(input, {
+      return new NameCaseConverter({
         converters: [
           new Converter(/^(a|an|the|to|in|on|of|from|and|with)$/i, (chunk, index) => {
             return index ? chunk.toLowerCase() : NameCaseConverter.toTitleCase(chunk)
           })
         ]
-      }).toString()
+      }).convert(input)
     }
     return input.charAt(0).toUpperCase() + input.substring(1, input.length).toLowerCase()
   }
@@ -267,8 +265,8 @@ export class NameCaseConverter {
  * @return {*}  {string}
  */
 export function toNameCase(input: string, options?: NameCaseConverterOptions): string {
-  const converter = new NameCaseConverter(input, options)
-  return converter.toString()
+  const converter = new NameCaseConverter(options)
+  return converter.convert(input)
 }
 
 /**

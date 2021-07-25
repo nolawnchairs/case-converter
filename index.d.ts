@@ -73,13 +73,13 @@ export declare class NameCaseConverter {
   /**
    * Creates an instance of NameCaseConverter.
    */
-  constructor(input: string);
-  constructor(input: string, options: NameCaseConverterOptions);
+  constructor();
+  constructor(options: NameCaseConverterOptions);
   /**
    * Processes each space-separated part of the input
    * into proper name-case
    */
-  toString(): string
+  convert(input: string): string
   /**
    * Converts a string to Title Case
    */
